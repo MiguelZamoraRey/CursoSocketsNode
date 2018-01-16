@@ -12,10 +12,23 @@ app.get('/hola-mundo', (req,res)=>{
     res.status(200).send('hi world');
 });
 
+var messages = [{
+    id:1,
+    text:'Welcome to the chat',
+    nickname: 'Bot-Chat'
+}];
+
 //cuando alguien se conecte:
 io.on('connection', (socket)=>{
-    console.log('Someone has connected from IP :'+socket.handshake.address)
-})
+    console.log('Someone has connected from IP :'+socket.handshake.address);
+    //para emitir los mensajes cuando se conecten
+    socket.emit('messages', messages);
+    //cuando recibamos un nuevo mensaje emitimos el array a todo el mundo
+    socket.on('add-message',(message)=>{
+        messages.push(message);
+        io.sockets.emit('messages',messages);
+    });
+});
 
 //conexion del srver
 server.listen(6677,()=>{
